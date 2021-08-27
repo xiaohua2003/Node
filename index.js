@@ -5,22 +5,32 @@ const fs=require('fs');
 
 ////
 //creating server using http module
+const tempOverview=fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const tempCard=fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
+const tempProduct=fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+
 const data=fs.readFileSync(`${__dirname}/dev-data/data.json`);
 const dataObject=JSON.parse(data)
 const http=require('http')
 const url=require('url')
 const server=http.createServer((req,res)=>{
     const pathName=req.url;
+    //Overview page
     if(pathName==='/'|| pathName==='/overview'){
-        res.end('this is overView')
+        res.writeHead(200, {
+            'Content-type':'text/html'
+        })
+        res.end(tempOverview);
+    //product page
     } else if (pathName==='/product'){
         res.end("this is ourt product")
+    //API
     }else if (pathName==='/api'){
            res.writeHead(200, {
                'content-type':'application/json'
            })
            res.end(data)
-       
+    //NOT FOUND 
     } else {
         res.writeHead(404, {
             'Content-type':'text/html'
