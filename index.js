@@ -5,6 +5,17 @@ const fs=require('fs');
 
 ////
 //creating server using http module
+function replaceTempCard(temp,product){
+    let output=temp.replace(/{%PRODUCTNAME%}/g, product.productName);
+    output=temp.replace(/{%QUANTITY%}/g, product.quantity);
+    output=temp.replace(/{%PRICE%}/g, product.price);
+    output=temp.replace(/{%IMAGE %}/g, product.image);
+    if(!product.organic){
+        output=temp.replace(/{%NOT_ORGANIC%}/g, 'not-organic')
+    }
+    return output
+}
+
 const tempOverview=fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
 const tempCard=fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
 const tempProduct=fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
@@ -20,7 +31,9 @@ const server=http.createServer((req,res)=>{
         res.writeHead(200, {
             'Content-type':'text/html'
         })
-        res.end(tempOverview);
+        const cardsHtml=dataObject.map(el=>replaceTempCard(tempCard, el)).join('')
+        const output=tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardsHtml)
+        res.end(output);
     //product page
     } else if (pathName==='/product'){
         res.end("this is ourt product")
@@ -38,6 +51,6 @@ const server=http.createServer((req,res)=>{
         res.end('<h1>page not found</h1>')
     }
 })
-server.listen (8018, ()=>{
+server.listen (8022, ()=>{
     console.log("listening to request on port 8006");
 })
